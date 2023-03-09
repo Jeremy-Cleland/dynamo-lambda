@@ -8,29 +8,17 @@ const People = dynamoose.model('people-table', {
 });
 
 exports.handler = async (event) => {
-  let id;
-  if (typeof event.pathParameters.id !== 'undefined' || null) {
-    id = event.pathParameters.id;
-  }
-  if (id) {
-    try {
-      const person = await People.get(id);
-      if (person) {
-        return {
-          statusCode: 200,
-          body: JSON.stringify(person),
-        };
-      } else {
-        return {
-          statusCode: 404,
-          body: `Record Not Found for ID: ${id}`,
-        };
-      }
-    } catch (error) {
-      return {
-        statusCode: 500,
-        body: JSON.stringify(error),
-      };
-    }
+  // Get Records from DynamoDB
+  try {
+    const people = await People.scan().exec();
+    return {
+      statusCode: 200,
+      body: JSON.stringify(people),
+    };
+  } catch (error) {
+    return {
+      statusCode: 500,
+      body: JSON.stringify(error),
+    };
   }
 };
